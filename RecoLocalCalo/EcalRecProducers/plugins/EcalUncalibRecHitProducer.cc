@@ -35,14 +35,18 @@ private:
 };
 
 EcalUncalibRecHitProducer::EcalUncalibRecHitProducer(const edm::ParameterSet& ps) {
+  isPhase2_ = ps.getParameter<bool>("IsPhase2");
   ebHitCollection_ = ps.getParameter<std::string>("EBhitCollection");
   eeHitCollection_ = ps.getParameter<std::string>("EEhitCollection");
   produces<EBUncalibratedRecHitCollection>(ebHitCollection_);
   produces<EEUncalibratedRecHitCollection>(eeHitCollection_);
 
-  ebDigiCollectionToken_ = consumes<EBDigiCollection>(ps.getParameter<edm::InputTag>("EBdigiCollection"));
-
-  eeDigiCollectionToken_ = consumes<EEDigiCollection>(ps.getParameter<edm::InputTag>("EEdigiCollection"));
+  if (isPhase2_) {
+    ebPh2DigiCollectionToken_ = consumes<EBDigiCollectionPh2>(ps.getParameter<edm::InputTag>("EBdigiCollection"));
+  } else {
+    ebDigiCollectionToken_ = consumes<EBDigiCollection>(ps.getParameter<edm::InputTag>("EBdigiCollection"));
+    eeDigiCollectionToken_ = consumes<EEDigiCollection>(ps.getParameter<edm::InputTag>("EEdigiCollection"));
+  }
 
   std::string componentType = ps.getParameter<std::string>("algo");
   edm::ParameterSet algoConf = ps.getParameter<edm::ParameterSet>("algoPSet");
@@ -57,6 +61,7 @@ void EcalUncalibRecHitProducer::fillDescriptions(edm::ConfigurationDescriptions&
 
   {
     edm::ParameterSetDescription desc;
+    desc.add<bool>("IsPhase2", false);
     desc.add<edm::InputTag>("EBdigiCollection", edm::InputTag("ecalDigis", "ebDigis"));
     desc.add<std::string>("EEhitCollection", "EcalUncalibRecHitsEE");
     desc.add<edm::InputTag>("EEdigiCollection", edm::InputTag("ecalDigis", "eeDigis"));
@@ -99,21 +104,26 @@ void EcalUncalibRecHitProducer::fillDescriptions(edm::ConfigurationDescriptions&
 void EcalUncalibRecHitProducer::produce(edm::Event& evt, const edm::EventSetup& es) {
   using namespace edm;
 
-  Handle<EBDigiCollection> pEBDigis;
-  Handle<EEDigiCollection> pEEDigis;
-
   const EBDigiCollection* ebDigis = nullptr;
   const EEDigiCollection* eeDigis = nullptr;
 
-  evt.getByToken(ebDigiCollectionToken_, pEBDigis);
-  ebDigis = pEBDigis.product();  // get a ptr to the produc
-  edm::LogInfo("EcalUncalibRecHitInfo") << "total # ebDigis: " << ebDigis->size();
+  if (isPhase2_) {  // Using Phase2 classes
+    Handle<EBDigiCollectionPh2> pEBDigis;
 
-  evt.getByToken(eeDigiCollectionToken_, pEEDigis);
-  eeDigis = pEEDigis.product();  // get a ptr to the product
-  edm::LogInfo("EcalUncalibRecHitInfo") << "total # eeDigis: " << eeDigis->size();
+    evt.getByToken(ebPh2DigiCollectionToken_, pEBDigis);
+    ebDigis = (EBDigiCollection*) pEBDigis.product();  // get a ptr to the product
+  } else {  // Using Phase1 classes
+    Handle<EBDigiCollection> pEBDigis;
+    Handle<EEDigiCollection> pEEDigis;
 
-  // tranparently get things from event setup
+    evt.getByToken(ebDigiCollectionToken_, pEBDigis);
+    ebDigis = pEBDigis.product();  // get a ptr to the product
+
+    evt.getByToken(eeDigiCollectionToken_, pEEDigis);
+    eeDigis = pEEDigis.product();  // get a ptr to the product
+  }
+
+  // transparently get things from event setup
   worker_->set(es);
   worker_->set(evt);
 
@@ -122,12 +132,16 @@ void EcalUncalibRecHitProducer::produce(edm::Event& evt, const edm::EventSetup& 
   auto eeUncalibRechits = std::make_unique<EEUncalibratedRecHitCollection>();
 
   // loop over EB digis
-  if (ebDigis)
+  if (ebDigis) {
+    edm::LogInfo("EcalUncalibRecHitInfo") << "total # ebDigis: " << ebDigis->size();
     worker_->run(evt, *ebDigis, *ebUncalibRechits);
+  }
 
   // loop over EB digis
-  if (eeDigis)
+  if (eeDigis) {
+    edm::LogInfo("EcalUncalibRecHitInfo") << "total # eeDigis: " << eeDigis->size();
     worker_->run(evt, *eeDigis, *eeUncalibRechits);
+  }
 
   // put the collection of recunstructed hits in the event
   evt.put(std::move(ebUncalibRechits), ebHitCollection_);
