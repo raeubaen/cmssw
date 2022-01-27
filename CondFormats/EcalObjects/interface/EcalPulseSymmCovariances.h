@@ -32,8 +32,7 @@ typedef EcalCondObjectContainer<EcalPulseSymmCovariance> EcalPulseSymmCovariance
 typedef EcalPulseSymmCovariancesMap::const_iterator EcalPulseSymmCovariancesMapIterator;
 typedef EcalPulseSymmCovariancesMap EcalPulseSymmCovariances;
 
-
-struct EcalPh2PulseSymmCovariance: public EcalPulseSymmCovariance {
+struct EcalPh2PulseSymmCovariance : public EcalPulseSymmCovariance {
 public:
   static const int TEMPLATESAMPLES = EcalPh2PulseShape::TEMPLATESAMPLES;
 };

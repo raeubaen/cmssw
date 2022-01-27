@@ -5,7 +5,6 @@
 #include "CondFormats/EcalObjects/interface/EcalCondObjectContainer.h"
 #include "DataFormats/EcalDigi/interface/EcalConstants.h"
 
-
 struct EcalPulseShape {
 public:
   static const int TEMPLATESAMPLES = 12;
@@ -23,9 +22,7 @@ typedef EcalCondObjectContainer<EcalPulseShape> EcalPulseShapesMap;
 typedef EcalPulseShapesMap::const_iterator EcalPulseShapesMapIterator;
 typedef EcalPulseShapesMap EcalPulseShapes;
 
-
-
-struct EcalPh2PulseShape: public EcalPulseShape {
+struct EcalPh2PulseShape : public EcalPulseShape {
 public:
   static const int TEMPLATESAMPLES = ecalPh2::sampleSize;
 };
@@ -33,7 +30,5 @@ public:
 typedef EcalCondObjectContainer<EcalPh2PulseShape> EcalPh2PulseShapesMap;
 typedef EcalPh2PulseShapesMap::const_iterator EcalPh2PulseShapesMapIterator;
 typedef EcalPh2PulseShapesMap EcalPh2PulseShapes;
-
-
 
 #endif

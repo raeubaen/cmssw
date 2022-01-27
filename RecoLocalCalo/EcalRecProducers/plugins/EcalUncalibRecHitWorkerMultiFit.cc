@@ -55,12 +55,21 @@ public:
 private:
   void set(const edm::EventSetup& es) override;
   void set(const edm::Event& evt) override;
-  void run(const edm::Event& evt, const EcalDigiCollection& digis, EcalUncalibratedRecHitCollection& result) override;
+  void run(const edm::Event& evt,
+           const edm::DataFrameContainer& digis,
+           EcalUncalibratedRecHitCollection& result) override;
 
 public:
   edm::ParameterSetDescription getAlgoDescription() override;
 
 private:
+  using SampleVector = typename EigenMatrixTypes<ecalPh1>::SampleVector;
+  using FullSampleVector = typename EigenMatrixTypes<ecalPh1>::FullSampleVector;
+  using SampleMatrix = typename EigenMatrixTypes<ecalPh1>::SampleMatrix;
+  using FullSampleMatrix = typename EigenMatrixTypes<ecalPh1>::FullSampleMatrix;
+  using SampleMatrixGainArray = typename EigenMatrixTypes<ecalPh1>::SampleMatrixGainArray;
+  using BXVector = typename EigenMatrixTypes<ecalPh1>::BXVector;
+
   edm::ESHandle<EcalPedestals> peds;
   edm::ESGetToken<EcalPedestals, EcalPedestalsRcd> pedsToken_;
   edm::ESHandle<EcalGainRatios> gains;
@@ -127,8 +136,8 @@ private:
   std::pair<double, double> EBtimeFitLimits_;
   std::pair<double, double> EEtimeFitLimits_;
 
-  EcalUncalibRecHitRatioMethodAlgo<EBDataFrame> ratioMethod_barrel_;
-  EcalUncalibRecHitRatioMethodAlgo<EEDataFrame> ratioMethod_endcap_;
+  EcalUncalibRecHitRatioMethodAlgo<EBDataFrame, EcalSampleMask> ratioMethod_barrel_;
+  EcalUncalibRecHitRatioMethodAlgo<EEDataFrame, EcalSampleMask> ratioMethod_endcap_;
 
   double EBtimeConstantTerm_;
   double EEtimeConstantTerm_;
@@ -398,7 +407,7 @@ double EcalUncalibRecHitWorkerMultiFit::timeCorrection(float ampli,
 }
 
 void EcalUncalibRecHitWorkerMultiFit::run(const edm::Event& evt,
-                                          const EcalDigiCollection& digis,
+                                          const edm::DataFrameContainer& digis,
                                           EcalUncalibratedRecHitCollection& result) {
   if (digis.empty())
     return;
