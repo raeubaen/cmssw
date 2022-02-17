@@ -1,26 +1,20 @@
-#ifndef CondFormats_EcalObjects_EcalWeightSet_HH
-#define CondFormats_EcalObjects_EcalWeightSet_HH
-/**
- * Author: Shahram Rahatlou, University of Rome & INFN
- * Container persistent object
- *  all weight objects needed to compute the pulse shape 
- *  with the weight method should go in this container
- *
- **/
+#ifndef CondFormats_EcalObjects_EcalWeightSetT_h
+#define CondFormats_EcalObjects_EcalWeightSetT_h
 
 #include "CondFormats/Serialization/interface/Serializable.h"
-
 #include "DataFormats/Math/interface/Matrix.h"
 #include <iostream>
 
-class EcalWeightSet {
+template <class P>
+class EcalWeightSetT {
 public:
-  typedef math::Matrix<3, 10>::type EcalWeightMatrix;
-  typedef math::Matrix<10, 10>::type EcalChi2WeightMatrix;
+  using EcalWeightMatrix =
+      typename math::Matrix<3, P::sampleSize>::type;  // 3 different types of weights (amplitude, pedestal, time)
+  using EcalChi2WeightMatrix = typename math::Matrix<P::sampleSize, P::sampleSize>::type;
 
-  EcalWeightSet();
-  EcalWeightSet(const EcalWeightSet& aset);
-  ~EcalWeightSet();
+  EcalWeightSetT();
+  EcalWeightSetT(const EcalWeightSetT<P>& aset);
+  ~EcalWeightSetT() = default;
 
   EcalWeightMatrix& getWeightsBeforeGainSwitch() { return wgtBeforeSwitch_; }
   EcalWeightMatrix& getWeightsAfterGainSwitch() { return wgtAfterSwitch_; }
@@ -32,7 +26,7 @@ public:
   const EcalChi2WeightMatrix& getChi2WeightsBeforeGainSwitch() const { return wgtChi2BeforeSwitch_; }
   const EcalChi2WeightMatrix& getChi2WeightsAfterGainSwitch() const { return wgtChi2AfterSwitch_; }
 
-  EcalWeightSet& operator=(const EcalWeightSet& rhs);
+  EcalWeightSetT& operator=(const EcalWeightSetT<P>& rhs);
 
   void print(std::ostream& o) const {
     using namespace std;
@@ -48,5 +42,8 @@ private:
 
   COND_SERIALIZABLE;
 };
+
+#include "DataFormats/EcalDigi/interface/EcalConstants.h"
+using EcalPh2WeightSet = EcalWeightSetT<ecalPh2>;
 
 #endif

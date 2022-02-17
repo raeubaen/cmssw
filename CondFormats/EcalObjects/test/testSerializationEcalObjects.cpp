@@ -89,7 +89,9 @@ int main() {
   testSerialization<EcalSimComponentShape>();
   testSerialization<EcalSimPulseShape>();
   testSerialization<EcalSampleMask>();
+  testSerialization<EcalPh2SampleMask>();
   testSerialization<EcalTBWeights>();
+  testSerialization<EcalPh2TBWeights>();
   testSerialization<EcalTPGCrystalStatus>();
   testSerialization<EcalTPGCrystalStatusCode>();
   testSerialization<EcalTPGFineGrainConstEB>();
@@ -123,10 +125,12 @@ int main() {
   testSerialization<EcalTimeDependentCorrections::Values>();
   testSerialization<EcalTimeOffsetConstant>();
   testSerialization<EcalWeightSet>();
+  testSerialization<EcalPh2WeightSet>();
   testSerialization<EcalWeightXtalGroups>();
   testSerialization<EcalXtalGroupId>();
   testSerialization<EcalTimeBiasCorrections>();
   testSerialization<EcalSamplesCorrelation>();
+  testSerialization<EcalPh2SamplesCorrelation>();
   testSerialization<EcalPulseShapes>();
   testSerialization<EcalPh2PulseShapes>();
   testSerialization<EcalPulseCovariances>();

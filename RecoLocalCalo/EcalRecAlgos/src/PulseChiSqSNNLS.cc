@@ -447,3 +447,4 @@ bool PulseChiSqSNNLS<P>::OnePulseMinimize() {
 
 #include "DataFormats/EcalDigi/interface/EcalConstants.h"
 template class PulseChiSqSNNLS<ecalPh1>;
+template class PulseChiSqSNNLS<ecalPh2>;

@@ -6,10 +6,11 @@
 
 template <class P>
 struct EigenMatrixTypes {
-  static constexpr int SampleVectorSize = P::sampleSize;
-  static constexpr int FullSampleVectorSize = 19;
-  static constexpr int PulseVectorSize = 12;
-  static constexpr int NGains = (P::NGAINS > 2) ? P::NGAINS - 1 : P::NGAINS;  // Do not count gain 0 for Phase 1
+  static constexpr int SampleVectorSize = static_cast<int>(P::sampleSize);
+  static constexpr int FullSampleVectorSize = static_cast<int>(P::kFullSampleVectorSize);
+  static constexpr int PulseVectorSize = static_cast<int>(P::kPulseShapeTemplateSampleSize);
+  static constexpr int NGains =
+      static_cast<int>((P::NGAINS > 2) ? P::NGAINS - 1 : P::NGAINS);  // Do not count gain 0 for Phase 1
 
   using SampleVector = Eigen::Matrix<double, SampleVectorSize, 1>;
   using FullSampleVector = Eigen::Matrix<double, FullSampleVectorSize, 1>;

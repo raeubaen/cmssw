@@ -201,13 +201,19 @@
 </class>
 
 <class name="EcalWeightSet"/>
+<class name="EcalPh2WeightSet"/>
 
 <class name="EcalTBWeights"/>
 <class name="std::pair<EcalXtalGroupId, EcalTBWeights::EcalTDCId>"/>
 <class name="std::map<std::pair<EcalXtalGroupId, EcalTBWeights::EcalTDCId>, EcalWeightSet>"/>
 <class name="std::pair<const std::pair<EcalXtalGroupId, EcalTBWeights::EcalTDCId>, EcalWeightSet>"/>
+<class name="EcalPh2TBWeights"/>
+<class name="std::pair<EcalXtalGroupId, EcalPh2TBWeights::EcalTDCId>"/>
+<class name="std::map<std::pair<EcalXtalGroupId, EcalPh2TBWeights::EcalTDCId>, EcalPh2WeightSet>"/>
+<class name="std::pair<const std::pair<EcalXtalGroupId, EcalPh2TBWeights::EcalTDCId>, EcalPh2WeightSet>"/>
 
 <class name="EcalSampleMask"/>
+<class name="EcalPh2SampleMask"/>
 
 <class name="EcalADCToGeVConstant"/>
 
@@ -283,6 +289,7 @@
 <class name="EcalTimeBiasCorrections" />
 
 <class name="EcalSamplesCorrelation" />
+<class name="EcalPh2SamplesCorrelation" />
 
 <!-- base class -->
 <class name="EcalPulseShape"/>

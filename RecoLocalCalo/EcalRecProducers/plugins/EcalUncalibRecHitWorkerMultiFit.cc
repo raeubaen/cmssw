@@ -537,7 +537,7 @@ void EcalUncalibRecHitWorkerMultiFit::run(const edm::Event& evt,
           ratioMethod_endcap_.init(*itdg, *sampleMask_, pedVec, pedRMSVec, gainRatios);
           ratioMethod_endcap_.computeTime(EEtimeFitParameters_, EEtimeFitLimits_, EEamplitudeFitParameters_);
           ratioMethod_endcap_.computeAmplitude(EEamplitudeFitParameters_);
-          EcalUncalibRecHitRatioMethodAlgo<EEDataFrame>::CalculatedRecHit crh =
+          EcalUncalibRecHitRatioMethodAlgo<EEDataFrame, EcalSampleMask>::CalculatedRecHit crh =
               ratioMethod_endcap_.getCalculatedRecHit();
           double theTimeCorrectionEE = timeCorrection(
               uncalibRecHit.amplitude(), timeCorrBias_->EETimeCorrAmplitudeBins, timeCorrBias_->EETimeCorrShiftBins);
@@ -578,7 +578,7 @@ void EcalUncalibRecHitWorkerMultiFit::run(const edm::Event& evt,
           ratioMethod_barrel_.fixMGPAslew(*itdg);
           ratioMethod_barrel_.computeTime(EBtimeFitParameters_, EBtimeFitLimits_, EBamplitudeFitParameters_);
           ratioMethod_barrel_.computeAmplitude(EBamplitudeFitParameters_);
-          EcalUncalibRecHitRatioMethodAlgo<EBDataFrame>::CalculatedRecHit crh =
+          EcalUncalibRecHitRatioMethodAlgo<EBDataFrame, EcalSampleMask>::CalculatedRecHit crh =
               ratioMethod_barrel_.getCalculatedRecHit();
 
           double theTimeCorrectionEB = timeCorrection(
@@ -632,10 +632,10 @@ void EcalUncalibRecHitWorkerMultiFit::run(const edm::Event& evt,
           result.pop_back();
           continue;
         }
-        const EcalWeightSet& wset = wit->second;  // this is the EcalWeightSet
+        const auto& wset = wit->second;  // this is the EcalWeightSet
 
-        const EcalWeightSet::EcalWeightMatrix& mat1 = wset.getWeightsBeforeGainSwitch();
-        const EcalWeightSet::EcalWeightMatrix& mat2 = wset.getWeightsAfterGainSwitch();
+        const auto& mat1 = wset.getWeightsBeforeGainSwitch();
+        const auto& mat2 = wset.getWeightsAfterGainSwitch();
 
         weights[0] = &mat1;
         weights[1] = &mat2;

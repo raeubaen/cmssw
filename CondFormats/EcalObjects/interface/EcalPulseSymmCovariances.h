@@ -4,6 +4,7 @@
 #include "CondFormats/Serialization/interface/Serializable.h"
 
 #include "CondFormats/EcalObjects/interface/EcalPulseShapes.h"
+#include "CondFormats/EcalObjects/interface/EcalPulseShapeT.h"
 #include "CondFormats/EcalObjects/interface/EcalCondObjectContainer.h"
 
 #include <algorithm>
@@ -35,6 +36,8 @@ typedef EcalPulseSymmCovariancesMap EcalPulseSymmCovariances;
 struct EcalPh2PulseSymmCovariance : public EcalPulseSymmCovariance {
 public:
   static const int TEMPLATESAMPLES = EcalPh2PulseShape::TEMPLATESAMPLES;
+
+  COND_SERIALIZABLE;
 };
 
 typedef EcalCondObjectContainer<EcalPulseSymmCovariance> EcalPh2PulseSymmCovariancesMap;
