@@ -17,9 +17,9 @@
 template <class C, class P>
 class EcalUncalibRecHitFixedAlphaBetaAlgo : public EcalUncalibRecHitRecAbsAlgo<C> {
 public:
-  EcalUncalibRecHitFixedAlphaBetaAlgo<C, P>();
-  EcalUncalibRecHitFixedAlphaBetaAlgo<C, P>(int n_iter, int n_bef_max = 1, int n_aft_max = 3, float sigma_ped = 1.1);
-  ~EcalUncalibRecHitFixedAlphaBetaAlgo<C, P>() override = default;
+  EcalUncalibRecHitFixedAlphaBetaAlgo();
+  EcalUncalibRecHitFixedAlphaBetaAlgo(int n_iter, int n_bef_max = 1, int n_aft_max = 3, float sigma_ped = 1.1);
+  ~EcalUncalibRecHitFixedAlphaBetaAlgo() override = default;
   EcalUncalibratedRecHit makeRecHit(const C& dataFrame,
                                     const double* pedestals,
                                     const double* gainRatios,

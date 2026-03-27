@@ -29,8 +29,8 @@ class EcalUncalibRecHitTimeWeightsAlgo {
 public:
   using FullSampleVector = typename EigenMatrixTypes<ecalPh1>::FullSampleVector;
 
-  EcalUncalibRecHitTimeWeightsAlgo<C>() {}
-  virtual ~EcalUncalibRecHitTimeWeightsAlgo<C>() {}
+  EcalUncalibRecHitTimeWeightsAlgo() {}
+  virtual ~EcalUncalibRecHitTimeWeightsAlgo() {}
 
   /// Compute time
   double time(const C &dataFrame,
