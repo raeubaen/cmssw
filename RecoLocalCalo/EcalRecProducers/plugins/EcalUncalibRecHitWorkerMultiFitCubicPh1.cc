@@ -507,6 +507,8 @@ void EcalUncalibRecHitWorkerMultiFitCubicPh1::run(const edm::Event& evt,
       // multifit
       const SampleMatrixGainArray& noisecors = noisecor(barrel);
 
+      multiFitMethod_.setIsBarrel(barrel);
+
       result.push_back(multiFitMethod_.makeRecHit(*itdg, aped, aGain, noisecors, fullpulse, fullpulsecov, activeBX, _spline));
       auto& uncalibRecHit = result.back();
 
