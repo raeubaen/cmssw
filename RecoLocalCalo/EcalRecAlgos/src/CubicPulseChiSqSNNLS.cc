@@ -5,6 +5,8 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <math.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 
 template <class P>
@@ -269,6 +271,26 @@ bool CubicPulseChiSqSNNLS<P>::DoFit(const SampleVector &samples,
   // std::cout << " _computeErrors = " << _computeErrors << std::endl;
 
   std::cout << "time: " << _time << std::endl;
+
+  SampleVector model = _pulsemat*_ampvec;
+
+  if (_ampvec.coeff(GetSignalPulseIndex()) > 100 && _isBarrel ) {
+
+      static std::ofstream csv("pulse_dump.csv", std::ios::app);
+
+      csv << _ampvec.coeff(GetSignalPulseIndex()) << ','
+          << _time.coeff(GetSignalPulseIndex());
+
+      // model
+      for (Eigen::Index i = 0; i < model.size(); ++i)
+          csv << ',' << model(i);
+
+      // samples
+      for (Eigen::Index i = 0; i < _sampvec.size(); ++i)
+          csv << ',' << _sampvec(i);
+
+      csv << '\n';
+  }
 
   _computeErrors = false; // .... remove...
   if(!_computeErrors) return status;
