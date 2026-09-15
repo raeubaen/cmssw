@@ -49,6 +49,7 @@ public:
   void setAddPedestalUncertainty(double x) { _addPedestalUncertainty = x; }
   void setSimplifiedNoiseModelForGainSwitch(bool b) { _simplifiedNoiseModelForGainSwitch = b; }
   void setGainSwitchUseMaxSample(bool b) { _gainSwitchUseMaxSample = b; }
+  void setIsBarrel(bool b) { _isBarrel = b; }
 
 private:
   CubicPulseChiSqSNNLS<ecalPh1> _pulsefunc;
@@ -62,6 +63,7 @@ private:
   double _addPedestalUncertainty;
   bool _simplifiedNoiseModelForGainSwitch;
   bool _gainSwitchUseMaxSample;
+  bool _isBarrel;
   BXVector _singlebx;
 };
 
