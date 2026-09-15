@@ -51,6 +51,7 @@ public:
   void disableErrorCalculation() { _computeErrors = false; }
   void setMaxIters(int n) { _maxiters = n; }
   void setMaxIterWarnings(bool b) { _maxiterwarnings = b; }
+  void setIsBarrel(bool b) { _isBarrel = b; }
 
 protected:
   int GetSignalPulseIndex();
@@ -99,6 +100,7 @@ protected:
   bool _computeErrors;
   int _maxiters;
   bool _maxiterwarnings;
+  bool _isBarrel;
 
   const int _pedestalBxOffset = 100;
   const int _stepCorrBxOffset = -100;
