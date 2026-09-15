@@ -188,6 +188,7 @@ EcalUncalibratedRecHit EcalUncalibRecHitMultiFitCubicAlgoPh1::makeRecHit(const E
   if (!usePrefit) {
     if (!_computeErrors)
       _pulsefunc.disableErrorCalculation();
+    _pulsefunc.setIsBarrel(_isBarrel);
     status = _pulsefunc.DoFit(amplitudes, noisecov, activeBX, fullpulse, fullpulsecov, spline, gainsPedestal, badSamples);
     chisq = _pulsefunc.ChiSq();
 
