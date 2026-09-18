@@ -70,6 +70,9 @@
 #include "CondFormats/EcalObjects/interface/EcalSimComponentShape.h"
 #include "CondFormats/EcalObjects/interface/EcalMustacheSCParameters.h"
 #include "CondFormats/EcalObjects/interface/EcalSCDynamicDPhiParameters.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseSymmCovarianceT.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseShapeT.h"
+
 //ECAL PH2:
 #include "CondFormats/EcalObjects/interface/EcalLiteDTUPedestals.h"
 #include "CondFormats/EcalObjects/interface/EcalCATIAGainRatios.h"

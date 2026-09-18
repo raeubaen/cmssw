@@ -14,7 +14,10 @@
 #include "CondFormats/EcalObjects/interface/EcalTPGOddWeightGroup.h"
 #include "CondFormats/EcalObjects/interface/EcalTPGOddWeightIdMap.h"
 #include "CondFormats/EcalObjects/interface/EcalTPGTPMode.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseSymmCovarianceT.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseShapeT.h"
 
 #include "CondFormats/External/interface/EcalDetID.h"
 #include "CondFormats/External/interface/SMatrix.h"
 #include "CondFormats/External/interface/Timestamp.h"
+
