@@ -1,0 +1,20 @@
+universe = vanilla
+
+executable = /afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src/Configuration/Generator/test/matchedDoubleGun/run.sh
+arguments = $(Process)
+
+initialdir = /afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src
+
+should_transfer_files = YES
+
+when_to_transfer_output = ON_EXIT
+
+RequestCpus = 4
+
+output = logs/job_$(Process).out
+error  = logs/job_$(Process).err
+log    = logs/condor.log
+
++JobFlavour = "longlunch"
+
+queue 10000
