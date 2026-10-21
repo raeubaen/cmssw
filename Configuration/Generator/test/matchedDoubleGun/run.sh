@@ -15,12 +15,12 @@ RANDOMSEED=$RANDOM
 
 OUTDIR=/afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src/data
 
-NEVENTS=10
+NEVENTS=100
 
-bash /afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src/Configuration/Generator/test/matchedDoubleGun/run_ele.sh "$RANDOMSEED" "$OUTDIR" $NEVENTS $NJOB > /eos/user/r/rgargiul/www/matched_samples/logs/log_ele_$NJOB  2>&1 &
+bash /afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src/Configuration/Generator/test/matchedDoubleGun/run_ele.sh "$RANDOMSEED" "$OUTDIR" $NEVENTS $NJOB > /dev/null  2>&1 &
 pid_ele=$!
 
-bash /afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src/Configuration/Generator/test/matchedDoubleGun/run_pho.sh "$RANDOMSEED" "$OUTDIR" $NEVENTS $NJOB > /eos/user/r/rgargiul/www/matched_samples/logs/log_gamma_$NJOB 2>&1 &
+bash /afs/cern.ch/work/r/rgargiul/CMSSW_14_0_25/src/Configuration/Generator/test/matchedDoubleGun/run_pho.sh "$RANDOMSEED" "$OUTDIR" $NEVENTS $NJOB > /dev/null 2>&1 &
 pid_pho=$!
 
 status=0
