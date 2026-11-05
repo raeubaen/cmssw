@@ -57,6 +57,9 @@ typedef popcon::PopConAnalyzer<EcalPedestalsHandler> EcalPedestalsAnalyzer;
 typedef EcalCondHandler<EcalPulseShapes, EcalPulseShapesXMLTranslator> EcalPulseShapesHandler;
 typedef popcon::PopConAnalyzer<EcalPulseShapesHandler> EcalPulseShapesAnalyzer;
 
+typedef EcalCondHandler<EcalPulseShapes, EcalPulseShapesXMLTranslator> EcalCubicPulseShapesHandler;
+typedef popcon::PopConAnalyzer<EcalPulseShapesHandler> EcalCubicPulseShapesAnalyzer;
+
 typedef EcalCondHandler<EcalPulseSymmCovariances, EcalPulseSymmCovariancesXMLTranslator> EcalPulseSymmCovariancesHandler;
 typedef popcon::PopConAnalyzer<EcalPulseSymmCovariancesHandler> EcalPulseSymmCovariancesAnalyzer;
 

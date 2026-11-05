@@ -78,3 +78,8 @@
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGLinearizationConst.h"
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGPedestals.h"
 #include "CondFormats/EcalObjects/interface/EcalEBPhase2TPGSpikeTaggerParams.h"
+#include "CondFormats/EcalObjects/interface/EcalTBWeightsT.h"
+#include "CondFormats/EcalObjects/interface/EcalWeightSetT.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseSymmCovarianceT.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseShapeT.h"
+#include "CondFormats/EcalObjects/interface/EcalPh2SamplesCorrelation.h"

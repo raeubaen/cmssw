@@ -26,6 +26,8 @@
 template <class C>
 class EcalUncalibRecHitTimeWeightsAlgo {
 public:
+  using FullSampleVector = typename EigenMatrixTypes<ecalPh1>::FullSampleVector;
+  
   EcalUncalibRecHitTimeWeightsAlgo() {}
   virtual ~EcalUncalibRecHitTimeWeightsAlgo() {}
 

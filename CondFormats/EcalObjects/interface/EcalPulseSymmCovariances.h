@@ -4,6 +4,7 @@
 #include "CondFormats/Serialization/interface/Serializable.h"
 
 #include "CondFormats/EcalObjects/interface/EcalPulseShapes.h"
+#include "CondFormats/EcalObjects/interface/EcalCubicPulseShapeT.h"
 #include "CondFormats/EcalObjects/interface/EcalCondObjectContainer.h"
 
 #include <algorithm>
