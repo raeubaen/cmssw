@@ -389,6 +389,7 @@ void EcalUncalibRecHitPhase2CubicMultiFitProducer::run(const edm::Event& evt,
     const unsigned int hashedIndex = EBDetId(detid).hashedIndex();
     const auto* aped = &peds_->barrel(hashedIndex);
     const auto* aGain = &gains_->barrel(hashedIndex);
+    //auto *aGain = new EcalCATIAGainRatio; *aGain = 1;
     const auto* aPulse = &pulseshapes_->barrel(hashedIndex);
     const auto* aPulseCov = &pulsesymmcovariances_->barrel(hashedIndex);
 
