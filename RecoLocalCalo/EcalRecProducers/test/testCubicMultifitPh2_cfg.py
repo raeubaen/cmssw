@@ -1,4 +1,7 @@
 import FWCore.ParameterSet.Config as cms
+from Configuration.AlCa.GlobalTag import GlobalTag
+
+
 process = cms.Process("RECO2")
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -12,13 +15,20 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 
 # https://cms-conddb.cern.ch/cmsDbBrowser/list/Prod/gts/150X_mcRun4_realistic_v1
-process.GlobalTag.globaltag = '150X_mcRun4_realistic_v1'
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T35', 'EcalSimPulseShapePhaseII,EcalSimPulseShapeRcd,frontier://FrontierProd/CMS_CONDITIONS')
+
+
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("EcalPh2CubicPulseShapesRcd"),
              tag = cms.string("EcalPh2CubicPulseShapes_data"),
              connect = cms.string("sqlite_file:/afs/cern.ch/work/e/emanuele/public/ecal/phase2/ecaltemplates_popcon_phase2-data-test.db")
              )
     )
+
+
+process.load("SimCalorimetry.EcalSimProducers.esEcalLiteDTUPedestalsProducer_cfi")
+process.load("SimCalorimetry.EcalSimProducers.esCATIAGainProducer_cfi")
+
 
 #### CONFIGURE IT HERE
 isMC = True
