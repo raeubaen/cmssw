@@ -1,3 +1,5 @@
+#cmsRun dumpPhotonHighEt_cfg.py     globalTag=140X_mcRun3_2024_realistic_v26     runNr=1     outputFile=photon_mean_gbr_140X_mcRun3_2024_realistic_v26.root
+
 import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
 
