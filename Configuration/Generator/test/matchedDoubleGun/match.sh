@@ -34,7 +34,7 @@ run_job() {
     return "$status"
 }
 
-for i in $(seq 0 999); do
+for i in $(seq 0 9999); do
     while (( $(jobs -rp | wc -l) >= MAX_JOBS )); do
         wait -n || true
     done

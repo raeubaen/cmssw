@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 
 import argparse
@@ -10,39 +9,6 @@ import numpy as np
 # ============================================================
 # VARIABLES
 # ============================================================
-
-ELE_BRANCHES = [
-    "Electron_ecalEnergy",
-    "Electron_superclusterEta",
-    "Electron_superclusterPhi",
-    "Electron_etaWidth",
-    "Electron_phiWidth",
-    "Electron_seedClusEnergy",
-    "Electron_rawEnergy",
-    "Electron_hoeFull5x5",
-    "Electron_DeltaEtaInSeed",
-    "Electron_DeltaPhiInSeed",
-    "Electron_r9",
-    "Electron_r9Frac",
-    "Electron_sieie",
-    "Electron_sigmaIetaIphiFull5x5",
-    "Electron_sigmaIphiIphiFull5x5",
-    "Electron_eMax",
-    "Electron_e2nd",
-    "Electron_eTop",
-    "Electron_eBottom",
-    "Electron_eLeft",
-    "Electron_eRight",
-    "Electron_e2x5max",
-    "Electron_e2x5Left",
-    "Electron_e2x5Right",
-    "Electron_e2x5Top",
-    "Electron_e2x5Bottom",
-    "Electron_e5x5",
-    "Electron_PreshowerEnergy",
-    "Electron_genPartIdx"
-
-]
 
 PHO_BRANCHES = [
     "Photon_energy",
@@ -80,299 +46,240 @@ PHO_BRANCHES = [
 
 # ============================================================
 # HELPERS
-3# ============================================================
+# ============================================================
 
 def safe_div(num, den):
     return num / ak.where(den != 0, den, np.nan)
 
 
-def add_object(out, prefix, idx, arr, is_electron):
+def add_object(out, prefix, idx, arr):
 
     s = f"{prefix}{idx}_"
+    i = idx - 1
 
-    if is_electron:
+    def get(branch):
+        return arr[f"Photon_{branch}"][:, i]
 
-        out[s+"scEnergy"] = ak.to_numpy(arr["Electron_ecalEnergy"][:, idx-1])
+    def put(name, value):
+        out[s + name] = ak.to_numpy(value)
 
+    # --------------------------------------------------------
+    # Kinematics
+    # --------------------------------------------------------
 
-        out[s+"scEta"] = ak.to_numpy(arr["Electron_superclusterEta"][:, idx-1])
-        out[s+"scPhi"] = ak.to_numpy(arr["Electron_superclusterPhi"][:, idx-1])
+    put("scPt", get("pt"))
+    put("scEnergy", get("energy"))
 
-        out[s+"scPt"] = out[s+"scEnergy"] / np.cosh(out[s+"scEta"])
+    put("scEta", get("superclusterEta"))
+    put("scPhi", get("phi"))
 
-        out[s+"scEtaWidth"] = ak.to_numpy(arr["Electron_etaWidth"][:, idx-1])
-        out[s+"scPhiWidth"] = ak.to_numpy(arr["Electron_phiWidth"][:, idx-1])
+    put("scEtaWidth", get("etaWidth"))
+    put("scPhiWidth", get("phiWidth"))
 
-        out[s+"seedFrac"] = ak.to_numpy(
-            safe_div(
-                arr["Electron_seedClusEnergy"][:, idx-1],
-                arr["Electron_rawEnergy"][:, idx-1]
-            )
+    # --------------------------------------------------------
+    # Energy ratios
+    # --------------------------------------------------------
+
+    raw = get("energyRaw")
+    e5x5 = get("e5x5")
+
+    put(
+        "seedFrac",
+        safe_div(get("seedClusEnergy"), raw)
+    )
+
+    put(
+        "e5x5OverRaw",
+        safe_div(e5x5, raw)
+    )
+
+    # --------------------------------------------------------
+    # Shower shape
+    # --------------------------------------------------------
+
+    put("HoE", get("hoe"))
+
+    put(
+        "scDEtaSeed",
+        get("dEtaSeedClusSuperClus")
+    )
+
+    put(
+        "scDPhiSeed",
+        get("dPhiSeedClusSuperClus")
+    )
+
+    put("e3x3OverRaw", get("r9Frac"))
+
+    put("full5x5_r9", get("r9"))
+
+    put(
+        "full5x5_sigmaIEtaIEta",
+        get("sieie")
+    )
+
+    put(
+        "full5x5_sigmaIEtaIPhi",
+        get("sieip")
+    )
+
+    put(
+        "full5x5_sigmaIPhiIPhi",
+        get("sigmaIphiIphiFull5x5")
+    )
+
+    # --------------------------------------------------------
+    # Crystal energy ratios
+    # --------------------------------------------------------
+
+    ratios = {
+        "eMaxOverE5x5": "eMax",
+        "e2ndOverE5x5": "e2nd",
+        "eTopOverE5x5": "eTop",
+        "eBottomOverE5x5": "eBottom",
+        "eLeftOverE5x5": "eLeft",
+        "eRightOverE5x5": "eRight",
+        "e2x5MaxOverE5x5": "e2x5max",
+        "e2x5LeftOverE5x5": "e2x5Left",
+        "e2x5RightOverE5x5": "e2x5Right",
+        "e2x5TopOverE5x5": "e2x5Top",
+        "e2x5BottomOverE5x5": "e2x5Bottom",
+    }
+
+    for name, branch in ratios.items():
+        put(
+            name,
+            safe_div(get(branch), e5x5)
         )
 
-        out[s+"e5x5OverRaw"] = ak.to_numpy(
-            safe_div(
-                arr["Electron_e5x5"][:, idx-1],
-                arr["Electron_rawEnergy"][:, idx-1]
-            )
-        )
+    # --------------------------------------------------------
+    # Preshower
+    # --------------------------------------------------------
 
-        out[s+"HoE"] = ak.to_numpy(arr["Electron_hoeFull5x5"][:, idx-1])
-
-        out[s+"scDEtaSeed"] = ak.to_numpy(arr["Electron_DeltaEtaInSeed"][:, idx-1])
-        out[s+"scDPhiSeed"] = ak.to_numpy(arr["Electron_DeltaPhiInSeed"][:, idx-1])
-
-        out[s+"e3x3OverRaw"] = ak.to_numpy(arr["Electron_r9Frac"][:, idx-1])
-
-        out[s+"full5x5_r9"] = ak.to_numpy(arr["Electron_r9"][:, idx-1])
-
-        out[s+"full5x5_sigmaIEtaIEta"] = ak.to_numpy(
-            arr["Electron_sieie"][:, idx-1]
-        )
-
-        out[s+"full5x5_sigmaIEtaIPhi"] = ak.to_numpy(
-            arr["Electron_sigmaIetaIphiFull5x5"][:, idx-1]
-        )
-
-        out[s+"full5x5_sigmaIPhiIPhi"] = ak.to_numpy(
-            arr["Electron_sigmaIphiIphiFull5x5"][:, idx-1]
-        )
-
-        e5x5 = arr["Electron_e5x5"][:, idx-1]
-
-        out[s+"eMaxOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_eMax"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2ndOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_e2nd"][:, idx-1], e5x5)
-        )
-
-        out[s+"eTopOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_eTop"][:, idx-1], e5x5)
-        )
-
-        out[s+"eBottomOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_eBottom"][:, idx-1], e5x5)
-        )
-
-        out[s+"eLeftOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_eLeft"][:, idx-1], e5x5)
-        )
-
-        out[s+"eRightOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_eRight"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5MaxOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_e2x5max"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5LeftOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_e2x5Left"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5RightOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_e2x5Right"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5TopOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_e2x5Top"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5BottomOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Electron_e2x5Bottom"][:, idx-1], e5x5)
-        )
-
-        out[s+"esEnergyOverSCRawEnergy"] = ak.to_numpy(
-            safe_div(
-                arr["Electron_PreshowerEnergy"][:, idx-1],
-                arr["Electron_rawEnergy"][:, idx-1]
-            )
-        )
-
-    else:
-
-        out[s+"scPt"] = ak.to_numpy(arr["Photon_pt"][:, idx-1])
-
-        out[s+"scEnergy"] = ak.to_numpy(arr["Photon_energy"][:, idx-1])
-
-        out[s+"scEta"] = ak.to_numpy(arr["Photon_superclusterEta"][:, idx-1])
-        out[s+"scPhi"] = ak.to_numpy(arr["Photon_phi"][:, idx-1])
-
-        out[s+"scEtaWidth"] = ak.to_numpy(arr["Photon_etaWidth"][:, idx-1])
-        out[s+"scPhiWidth"] = ak.to_numpy(arr["Photon_phiWidth"][:, idx-1])
-
-        out[s+"seedFrac"] = ak.to_numpy(
-            safe_div(
-                arr["Photon_seedClusEnergy"][:, idx-1],
-                arr["Photon_energyRaw"][:, idx-1]
-            )
-        )
-
-        out[s+"e5x5OverRaw"] = ak.to_numpy(
-            safe_div(
-                arr["Photon_e5x5"][:, idx-1],
-                arr["Photon_energyRaw"][:, idx-1]
-            )
-        )
-
-        out[s+"HoE"] = ak.to_numpy(arr["Photon_hoe"][:, idx-1])
-
-        out[s+"scDEtaSeed"] = ak.to_numpy(
-            arr["Photon_dEtaSeedClusSuperClus"][:, idx-1]
-        )
-
-        out[s+"scDPhiSeed"] = ak.to_numpy(
-            arr["Photon_dPhiSeedClusSuperClus"][:, idx-1]
-        )
-
-        out[s+"e3x3OverRaw"] = ak.to_numpy(arr["Photon_r9Frac"][:, idx-1])
-
-        out[s+"full5x5_r9"] = ak.to_numpy(arr["Photon_r9"][:, idx-1])
-
-        out[s+"full5x5_sigmaIEtaIEta"] = ak.to_numpy(
-            arr["Photon_sieie"][:, idx-1]
-        )
-
-        out[s+"full5x5_sigmaIEtaIPhi"] = ak.to_numpy(
-            arr["Photon_sieip"][:, idx-1]
-        )
-
-        out[s+"full5x5_sigmaIPhiIPhi"] = ak.to_numpy(
-            arr["Photon_sigmaIphiIphiFull5x5"][:, idx-1]
-        )
-
-        e5x5 = arr["Photon_e5x5"][:, idx-1]
-
-        out[s+"eMaxOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_eMax"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2ndOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_e2nd"][:, idx-1], e5x5)
-        )
-
-        out[s+"eTopOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_eTop"][:, idx-1], e5x5)
-        )
-
-        out[s+"eBottomOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_eBottom"][:, idx-1], e5x5)
-        )
-
-        out[s+"eLeftOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_eLeft"][:, idx-1], e5x5)
-        )
-
-        out[s+"eRightOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_eRight"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5MaxOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_e2x5max"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5LeftOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_e2x5Left"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5RightOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_e2x5Right"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5TopOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_e2x5Top"][:, idx-1], e5x5)
-        )
-
-        out[s+"e2x5BottomOverE5x5"] = ak.to_numpy(
-            safe_div(arr["Photon_e2x5Bottom"][:, idx-1], e5x5)
-        )
-
-        out[s+"esEnergyOverSCRawEnergy"] = ak.to_numpy(
-            arr["Photon_esEnergyOverRawE"][:, idx-1]
-        )
+    put(
+        "esEnergyOverSCRawEnergy",
+        get("esEnergyOverRawE")
+    )
 
 
 # ============================================================
 # MAIN
 # ============================================================
 
-parser = argparse.ArgumentParser()
+def main():
 
-parser.add_argument("--electron", required=True)
-parser.add_argument("--photon", required=True)
-parser.add_argument("-o", "--output", required=True)
+    parser = argparse.ArgumentParser()
 
-args = parser.parse_args()
+    parser.add_argument("--electron", required=True)
+    parser.add_argument("--photon", required=True)
+    parser.add_argument("-o", "--output", required=True)
 
-ele = uproot.open(args.electron)["Events"].arrays(
-    ["event"] + ELE_BRANCHES
-)
+    args = parser.parse_args()
 
-pho = uproot.open(args.photon)["Events"].arrays(
-    ["event"] + PHO_BRANCHES
-)
+    # --------------------------------------------------------
+    # Read ROOT files
+    # Both files use Photon_* branches
+    # --------------------------------------------------------
 
-evt_ele = ak.to_numpy(ele["event"])
-evt_pho = ak.to_numpy(pho["event"])
+    print("Reading electron file...")
 
-common_evt, idx_ele, idx_pho = np.intersect1d(
-    evt_ele,
-    evt_pho,
-    assume_unique=False,
-    return_indices=True,
-)
+    ele = uproot.open(args.electron)["Events"].arrays(
+        ["event"] + PHO_BRANCHES
+    )
 
-ele = ele[idx_ele]
-pho = pho[idx_pho]
+    print("Reading photon file...")
 
-assert np.array_equal(
-    ak.to_numpy(ele["event"]),
-    ak.to_numpy(pho["event"])
-)
+    pho = uproot.open(args.photon)["Events"].arrays(
+        ["event"] + PHO_BRANCHES
+    )
 
-mask = (
-    (ak.num(ele["Electron_r9"]) == 2)
-    &
-    (ak.num(pho["Photon_r9"]) == 2)
-)
+    # --------------------------------------------------------
+    # Match events using event only
+    # --------------------------------------------------------
 
-ele = ele[mask]
-pho = pho[mask]
+    evt_ele = ak.to_numpy(ele["event"])
+    evt_pho = ak.to_numpy(pho["event"])
 
-ele_order = ak.argsort(
-    ele["Electron_genPartIdx"],
-    axis=1
-)
+    common_evt, idx_ele, idx_pho = np.intersect1d(
+        evt_ele,
+        evt_pho,
+        assume_unique=False,
+        return_indices=True
+    )
 
-pho_order = ak.argsort(
-    pho["Photon_genPartIdx"],
-    axis=1
-)
+    print(f"Common events: {len(common_evt)}")
+
+    ele = ele[idx_ele]
+    pho = pho[idx_pho]
+
+    assert np.array_equal(
+        ak.to_numpy(ele["event"]),
+        ak.to_numpy(pho["event"])
+    )
+
+    # --------------------------------------------------------
+    # Require exactly 2 objects in each file
+    # --------------------------------------------------------
+
+    mask = (
+        (ak.num(ele["Photon_r9"]) == 2)
+        &
+        (ak.num(pho["Photon_r9"]) == 2)
+    )
+
+    ele = ele[mask]
+    pho = pho[mask]
+
+    print(
+        f"Kept {len(ele)} events with exactly "
+        "2 electron candidates + 2 photon candidates"
+    )
+
+    # --------------------------------------------------------
+    # Sort objects by Photon_genPartIdx
+    # --------------------------------------------------------
+
+    ele_order = ak.argsort(
+        ele["Photon_genPartIdx"],
+        axis=1
+    )
+
+    pho_order = ak.argsort(
+        pho["Photon_genPartIdx"],
+        axis=1
+    )
+
+    for k in ele.fields:
+        if k != "event":
+            ele[k] = ele[k][ele_order]
+
+    for k in pho.fields:
+        if k != "event":
+            pho[k] = pho[k][pho_order]
+
+    # --------------------------------------------------------
+    # Build output
+    # --------------------------------------------------------
+
+    out = {}
+
+    add_object(out, "Electron", 1, ele)
+    add_object(out, "Electron", 2, ele)
+
+    add_object(out, "Photon", 1, pho)
+    add_object(out, "Photon", 2, pho)
+
+    # --------------------------------------------------------
+    # Write ROOT output
+    # --------------------------------------------------------
+
+    print("Writing output...")
+
+    with uproot.recreate(args.output) as fout:
+        fout["Events"] = out
+
+    print("Done.")
 
 
-for k in ele.fields:
-    if k != "event":
-        ele[k] = ele[k][ele_order]
-
-for k in pho.fields:
-    if k != "event":
-        pho[k] = pho[k][pho_order]
-
-print(f"Kept {len(ele)} events with exactly 2e + 2gamma")
-
-out = {}
-
-add_object(out, "Electron", 1, ele, True)
-add_object(out, "Electron", 2, ele, True)
-
-add_object(out, "Photon", 1, pho, False)
-add_object(out, "Photon", 2, pho, False)
-
-print("Writing output...")
-
-with uproot.recreate(args.output) as fout:
-    fout["Events"] = out
-
-print("Done.")
+if __name__ == "__main__":
+    main()
