@@ -1,0 +1,6 @@
+tmp/el9_amd64_gcc12/RegressionTrainer.o: main/RegressionTrainer.cc \
+ include/RegresTrainer/RegressionManager.h \
+ include/RegresTrainer/ParReader.h
+main/RegressionTrainer.cc :
+ include/RegresTrainer/RegressionManager.h :
+ include/RegresTrainer/ParReader.h :

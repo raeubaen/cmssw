@@ -1,0 +1,7 @@
+tmp/el9_amd64_gcc12/RegresTrainer/src/TrackMomentumCorrection.o: \
+ packages/RegresTrainer/src/TrackMomentumCorrection.cc \
+ include/RegresTrainer/TrackMomentumCorrection.h \
+ include/RegresTrainer/ICorrection.h
+ packages/RegresTrainer/src/TrackMomentumCorrection.cc :
+ include/RegresTrainer/TrackMomentumCorrection.h :
+ include/RegresTrainer/ICorrection.h :

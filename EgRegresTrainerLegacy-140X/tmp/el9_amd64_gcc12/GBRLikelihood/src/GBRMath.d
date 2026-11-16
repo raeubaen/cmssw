@@ -1,0 +1,17 @@
+GBRMath.o: packages/GBRLikelihood/src/GBRMath.cc \
+ include/GBRLikelihood/GBRMath.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/vdtMath.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/sin.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/sincos.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/vdtcore_common.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/asin.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/cos.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/tan.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/tanh.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/atan.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/atan2.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/exp.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/log.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/sqrt.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/inv.h \
+ /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/vdt/0.4.0/include/vdt/identity.h

@@ -1,0 +1,4 @@
+tmp/el9_amd64_gcc12/RegresTrainer/src/GBREvent.o: packages/RegresTrainer/src/GBREvent.cc \
+ include/RegresTrainer/GBREvent.h
+packages/RegresTrainer/src/GBREvent.cc :
+ include/RegresTrainer/GBREvent.h :
