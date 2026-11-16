@@ -9,11 +9,14 @@
 #include <algorithm>
 
 
-template <typename T>
+template <class P>
 
 struct EcalCubicPulseSymmCovarianceT {
 public:
-  static constexpr int TEMPLATESAMPLES = static_cast<int>(T::kPulseShapeTemplateSampleSize);
+
+  //T phase_constants_instance;
+
+  static constexpr int TEMPLATESAMPLES = static_cast<int>(P::kPulseShapeTemplateSampleSize);
 
   float covval[TEMPLATESAMPLES * (TEMPLATESAMPLES + 1) / 2];
 
@@ -31,8 +34,8 @@ public:
     for (int k = 0; k < N; ++k) covval[k] = 0.;
   };
 
-  COND_SERIALIZABLE;
 
+  COND_SERIALIZABLE;
 };
 
 

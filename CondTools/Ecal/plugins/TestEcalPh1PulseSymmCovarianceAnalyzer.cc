@@ -3,7 +3,7 @@
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 
-typedef popcon::PopConAnalyzer<popcon::EcalCubicPulseSymmCovariancesHandler<EcalPh1PulseSymmCovariance>> ExTestEcalPh1PulseSymmCovariancesAnalyzer;
+typedef popcon::PopConAnalyzer<popcon::EcalCubicPulseSymmCovariancesHandler<EcalPh1PulseSymmCovariances>> ExTestEcalPh1PulseSymmCovariancesAnalyzer;
 
 
 //define this as a plug-in

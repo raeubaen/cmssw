@@ -22,9 +22,12 @@ process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record = cms.string("EcalPh2CubicPulseShapesRcd"),
              tag = cms.string("EcalPh2CubicPulseShapes_mc"),
              connect = cms.string("sqlite_file:/afs/cern.ch/work/e/emanuele/public/ecal/phase2/ecaltemplates_popcon_phase2-mc-test.db")
-             )
+    ),
+    cms.PSet(record = cms.string("EcalPh2PulseSymmCovariancesRcd"),
+             tag = cms.string("EcalPh2PulseSymmCovariances_mc"),
+             connect = cms.string("sqlite_file:/afs/cern.ch/work/e/emanuele/public/ecal/phase2/ecalcovariances_popcon_phase2-mc-test.db")
     )
-
+)
 
 process.load("SimCalorimetry.EcalSimProducers.esEcalLiteDTUPedestalsProducer_cfi")
 process.load("SimCalorimetry.EcalSimProducers.esCATIAGainProducer_cfi")

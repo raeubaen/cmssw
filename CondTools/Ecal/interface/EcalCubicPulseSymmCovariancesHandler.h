@@ -30,11 +30,29 @@
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/Provenance/interface/Timestamp.h"
 
+
+#include "DataFormats/EcalDigi/interface/EcalConstants.h"
+
+#include <type_traits>
+
+
 namespace edm {
   class ParameterSet;
   class Event;
   class EventSetup;
 }  // namespace edm
+
+
+
+template <typename P>
+struct GetPhaseConstantsType;
+
+template <typename T>
+struct GetPhaseConstantsType<
+    EcalCondObjectContainer<EcalCubicPulseSymmCovarianceT<T>>
+> {
+    using type = T;
+};
 
 
 // P = EcalCubicPulseSymmCovarianceT<ecalPh1/2>
@@ -45,6 +63,16 @@ namespace popcon {
   public:
     EcalCubicPulseSymmCovariancesHandler(const edm::ParameterSet &ps)
       : m_name(ps.getUntrackedParameter<std::string>("name", "EcalCubicPulseSymmCovariancesHandler")) {
+
+       using T = typename GetPhaseConstantsType<P>::type;
+
+       if constexpr (std::is_same_v<T, ecalPh1>) {
+          isPhase1 = true;
+        }
+        else if constexpr (std::is_same_v<T, ecalPh2>) {
+          isPhase1 = false;
+        }
+
         std::cout << "EcalPulseSymmCovariance Source handler constructor\n" << std::endl;
         m_firstRun = static_cast<unsigned int>(atoi(ps.getParameter<std::string>("firstRun").c_str()));
         m_filename = ps.getParameter<std::string>("inputFileName");
@@ -89,7 +117,7 @@ namespace popcon {
 
       typename P::Item item;
 
-      float covvals[item->TEMPLATESAMPLES][item->TEMPLATESAMPLES];
+      float covvals[item.TEMPLATESAMPLES][item.TEMPLATESAMPLES];
 
       unsigned int rawId;
       int isbarrel;
@@ -106,9 +134,9 @@ namespace popcon {
           std::istringstream linereader(line);
           linereader >> isbarrel >> rawId;
           // std::cout << "Inserting template for crystal with rawId = " << rawId << " (isbarrel = " << isbarrel << ") " << std::endl;
-          for (int k = 0; k < std::pow(item->TEMPLATESAMPLES, 2); ++k) {
-            int i = k / item->TEMPLATESAMPLES;
-            int j = k % item->TEMPLATESAMPLES;
+          for (int k = 0; k < std::pow(item.TEMPLATESAMPLES, 2); ++k) {
+            int i = k / item.TEMPLATESAMPLES;
+            int j = k % item.TEMPLATESAMPLES;
             linereader >> covvals[i][j];
           }
 
@@ -117,8 +145,8 @@ namespace popcon {
             return;
           }
 
-          for (int i = 0; i < item->TEMPLATESAMPLES; ++i)
-            for (int j = 0; j < item->TEMPLATESAMPLES; ++j) {
+          for (int i = 0; i < item.TEMPLATESAMPLES; ++i)
+            for (int j = 0; j < item.TEMPLATESAMPLES; ++j) {
               item.val(i, j) = covvals[i][j];
             }
 
@@ -155,37 +183,46 @@ namespace popcon {
             std::vector<EBDetId>::iterator it = find(ebgood.begin(), ebgood.end(), ebdetid);
             if (it == ebgood.end()) {
               fillSimPulseSymmCovariance(&item, true);
+              std::cout << "inserting object!" << std::endl;
               pulsecovs->insert(std::make_pair(ebdetid.rawId(), item));
             }
           }
         }
       }
 
+      std::cout << "Filled the DB with BARREL!!"
+                << std::endl;
 
-      for (int iZ = -1; iZ < 2; iZ += 2) {
-        for (int iX = EEDetId::IX_MIN; iX <= EEDetId::IX_MAX; ++iX) {
-          for (int iY = EEDetId::IY_MIN; iY <= EEDetId::IY_MAX; ++iY) {
-            if (EEDetId::validDetId(iX, iY, iZ)) {
-              EEDetId eedetid(iX, iY, iZ);
 
-              std::vector<EEDetId>::iterator it = find(eegood.begin(), eegood.end(), eedetid);
-              if (it == eegood.end()) {
+      if (isPhase1){
+        for (int iZ = -1; iZ < 2; iZ += 2) {
+          for (int iX = EEDetId::IX_MIN; iX <= EEDetId::IX_MAX; ++iX) {
+            for (int iY = EEDetId::IY_MIN; iY <= EEDetId::IY_MAX; ++iY) {
+              if (EEDetId::validDetId(iX, iY, iZ)) {
+                EEDetId eedetid(iX, iY, iZ);
 
-                fillSimPulseSymmCovariance(&item, false);
-                pulsecovs->insert(std::make_pair(eedetid.rawId(), item));
+                std::vector<EEDetId>::iterator it = find(eegood.begin(), eegood.end(), eedetid);
+                if (it == eegood.end()) {
+
+                  fillSimPulseSymmCovariance(&item, false);
+                  pulsecovs->insert(std::make_pair(eedetid.rawId(), item));
+                }
               }
             }
           }
         }
       }
+      std::cout << "Filled the DB with ENDCAP!!"
+                << std::endl;
+
 
       std::cout << "Inserted the pulse covariances into the new item object" << std::endl;
 
       unsigned int irun = m_firstRun;
 
-      Time_t snc = (Time_t)irun;
+      cond::Time_t snc = (cond::Time_t)irun;
 
-      m_to_transfer.push_back(std::make_pair((P*)pulsecovs, snc));
+      this->m_to_transfer.push_back(std::make_pair((P*)pulsecovs, snc));
 
       std::cout << "Ecal - > end of getNewObjects -----------" << std::endl;
       std::cout << "N. bad shapes for EB = " << nEBbad << std::endl;
@@ -197,7 +234,8 @@ namespace popcon {
     std::string id() const override { return m_name; }
 
   private:
-
+    const P* mypulsesymmcovs;
+    bool isPhase1;
     unsigned int m_firstRun;
     unsigned int m_lastRun;
 
