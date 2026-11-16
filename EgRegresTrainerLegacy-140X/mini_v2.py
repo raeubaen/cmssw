@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""MiniAOD -> side-by-side CMSSW C++ and Python regression feature trees.
+"""MiniAOD -> side-by-side cxxregtools C++ and Python regression feature trees.
 
-Run inside CMSSW_14_0_25 with FWLite enabled. Uses persisted pat::Photon
+Run inside cxxregtools_14_0_25 with FWLite enabled. Uses persisted pat::Photon
 full5x5 quantities, never ECAL rechits. No ROOT file is published on failure.
 """
 import argparse
@@ -19,7 +19,7 @@ ROOT.gSystem.Load('libDataFormatsFWLite')
 ROOT.gSystem.Load('libCondFormatsGBRForest')
 from DataFormats.FWLite import Events, Handle
 
-CMSSW_REFERENCE_CPP = r"""
+cxxregtools_REFERENCE_CPP = r"""
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -214,7 +214,7 @@ def load_forests(path):
             raise RuntimeError('Missing ' + name)
         forest = getattr(tree, name, None)
         if forest is None or not hasattr(forest, 'GetResponse'):
-            raise RuntimeError('Could not deserialize ' + name + ' using CMSSW ROOT dictionaries')
+            raise RuntimeError('Could not deserialize ' + name + ' using cxxregtools ROOT dictionaries')
         result.append(forest)
     return f, tree, result
 
@@ -231,8 +231,8 @@ def main():
     args = parser.parse_args()
     ebvars, eevars = variables_from_repo(args.repo)
     names = feature_names(ebvars, eevars)
-    if not ROOT.gInterpreter.Declare(CMSSW_REFERENCE_CPP):
-        raise RuntimeError("Cannot compile CMSSW reference feature extractor")
+    if not ROOT.gInterpreter.Declare(cxxregtools_REFERENCE_CPP):
+        raise RuntimeError("Cannot compile cxxregtools reference feature extractor")
     print('Features from regtools.py: EB=%d EE=%d' % (len(ebvars), len(eevars)), flush=True)
     weightfile, payload_tree, forests = load_forests(args.weights)
     partial = args.output + '.partial'
@@ -263,11 +263,11 @@ def main():
         add(inp, 'nInputs')
         # Human-readable branch names from the exact regtools.py expressions.
         # EB-only variables are NaN for EE photons.
-        cmsswbuf = [add(inp, name + '_cmssw') for name in names]
+        cxxregtoolsbuf = [add(inp, name + '_cxxregtools') for name in names]
         trainerbuf = [add(inp, name + '_trainer') for name in names]
         diffbuf = [add(inp, name + '_diff') for name in names]
         ee_last_name = branch_feature_name(eevars[28])
-        ee_last_cmssw = add(inp, ee_last_name + '_cmssw')
+        ee_last_cxxregtools = add(inp, ee_last_name + '_cxxregtools')
         ee_last_trainer = add(inp, ee_last_name + '_trainer')
         ee_last_diff = add(inp, ee_last_name + '_diff')
         feature_labels = ROOT.TNamed(
@@ -339,15 +339,15 @@ def main():
                         buffers[(tree.GetName(), key)][0] = val
                 buffers[('egRegTree', 'nInputs')][0] = len(vector)
                 for i in range(32):
-                    cmsswbuf[i][0] = cxx[i] if i < len(cxx) else float('nan')
+                    cxxregtoolsbuf[i][0] = cxx[i] if i < len(cxx) else float('nan')
                     trainerbuf[i][0] = vector[i] if i < len(vector) else float('nan')
                     diffbuf[i][0] = diffs[i] if i < len(diffs) else float('nan')
-                ee_last_cmssw[0] = cxx[28] if not eb else float('nan')
+                ee_last_cxxregtools[0] = cxx[28] if not eb else float('nan')
                 ee_last_trainer[0] = vector[28] if not eb else float('nan')
                 ee_last_diff[0] = diffs[28] if not eb else float('nan')
                 if not eb:
                     # Avoid falsely labeling EE preshower fraction as EB iEtaMod5.
-                    cmsswbuf[28][0] = float('nan')
+                    cxxregtoolsbuf[28][0] = float('nan')
                     trainerbuf[28][0] = float('nan')
                     diffbuf[28][0] = float('nan')
                 inp.Fill()
