@@ -31,7 +31,7 @@ EE_NAMES = BASE + ["esOverRaw"]
 # NanoAOD Photon fields, exactly as used by the supplied working code.
 PHOTON_FIELDS = [
     "energy", "energyRaw", "rawPreshowerEnergy", "e5x5",
-    "dEtaSeedClusSuperClus", "dPhiSeedClusSuperClus", "etaWidth", "phiWidth", "seedClusEnergy",
+    "etaWidth", "phiWidth", "seedClusEnergy",
     "hoe", "r9", "esEnergyOverRawE", "sieie", "sieip", "sigmaIphiIphiFull5x5",
     "nSaturatedXtals", "numberOfClusters", "seediEtaOriX",
     "seediPhiOriY", "iEtaMod5", "iPhiMod2", "iEtaMod20",
@@ -39,6 +39,7 @@ PHOTON_FIELDS = [
     "eMax", "e2nd", "eTop", "eBottom", "eLeft", "eRight",
     "e2x5max", "e2x5Left", "e2x5Right", "e2x5Top", "e2x5Bottom",
 ]
+
 RATIOS = {
     "eMaxOver5": "eMax", "e2ndOver5": "e2nd",
     "eTopOver5": "eTop", "eBottomOver5": "eBottom",
@@ -148,6 +149,21 @@ def get_features(chunk, photon_prefix, rho_branch):
     def get(name):
         return flatten(chunk[photon_prefix + "_" + name])
 
+    def seed_sc_delta(axis):
+        direct = photon_prefix + "_d" + axis + "SeedClusSuperClus"
+
+        if direct in chunk:
+            return flatten(chunk[direct])
+
+        seed = get("seedCluster" + axis)
+        sc = get("supercluster" + axis)
+        delta = seed - sc
+
+        if axis == "Phi":
+            return np.arctan2(np.sin(delta), np.cos(delta))
+
+        return delta
+
     rho = np.repeat(np.asarray(ak.to_numpy(chunk[rho_branch]), dtype=np.float64), counts)
     raw = get("energyRaw")
     es = get("rawPreshowerEnergy")
@@ -160,8 +176,8 @@ def get_features(chunk, photon_prefix, rho_branch):
         "e5x5OverRaw": div(e5, raw),
         "hademCone": get("hoe"),
         "rho": rho,
-        "dEtaSeedSC": get("dEtaSeedClusSuperClus"),
-        "dPhiSeedSC": get("dPhiSeedClusSuperClus"),
+        "dEtaSeedSC": seed_sc_delta("Eta"),
+        "dPhiSeedSC": seed_sc_delta("Phi"),
         "r9": get("r9"),
         "sieie": get("sieie"),
         "sieip": get("sieip"),
@@ -210,7 +226,7 @@ def main():
     ap.add_argument("--tree", default="Events")
     ap.add_argument("--photon-prefix", default="Photon")
     ap.add_argument("--step-size", default="20 MB", help="uproot iteration step size")
-    ap.add_argument("--max-events", type=int, default=-1)
+    ap.add_argument("--max-events", type=int, default=100)
     args = ap.parse_args()
 
     eb_output_names, ee_output_names = output_feature_names()
@@ -219,6 +235,13 @@ def main():
     import array
     required = ["run", "luminosityBlock", "event", "n" + args.photon_prefix]
     required += [args.photon_prefix + "_" + f for f in PHOTON_FIELDS]
+    required.extend([
+        args.photon_prefix + "_seedClusterEta",
+        args.photon_prefix + "_seedClusterPhi",
+        args.photon_prefix + "_superclusterEta",
+        args.photon_prefix + "_superclusterPhi",
+    ])
+
 
     # Resolve rho exactly as in the supplied NanoAOD implementation.
     with uproot.open(args.input[0] + ":" + args.tree) as first:
