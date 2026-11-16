@@ -2,7 +2,8 @@ import sys
 import os.path
 import FWCore.ParameterSet.Config as cms
 
-FIRST_RUN = 2
+FIRST_RUN = 1
+
 POPULATE_MC = FIRST_RUN < 2
 
 txtfile = sys.argv[1]
