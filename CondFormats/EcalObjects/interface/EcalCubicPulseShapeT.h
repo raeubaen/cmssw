@@ -16,12 +16,12 @@ public:
   float parameters[TEMPLATESAMPLES*PARSPERSAMPLE];
 
   const float pdfval(int iSample) const {
-    int baseIndex = (iSample / PARSPERSAMPLE) * PARSPERSAMPLE;
+    int baseIndex = iSample * PARSPERSAMPLE;
     return parameters[baseIndex];
   }
 
   const float* splinepars(int iSample) const {
-    int baseIndex = (iSample / PARSPERSAMPLE) * PARSPERSAMPLE;
+    int baseIndex = iSample * PARSPERSAMPLE;
     return &parameters[baseIndex]; // returns pointer to part of array
   }
 
