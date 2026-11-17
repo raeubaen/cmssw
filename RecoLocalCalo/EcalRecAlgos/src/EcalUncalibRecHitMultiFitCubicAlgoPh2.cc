@@ -57,13 +57,16 @@ EcalUncalibratedRecHit EcalUncalibRecHitMultiFitCubicAlgoPh2::makeRecHit(const E
     const int gainId = sample.gainId();
 
     const double pedestal = aped->mean(gainId);
-    const double gainratio = *aGain;
 
-    if (gainId == 1) {
-      gainsNoise[iSample] = 2;
+    double gainratio = -99;
+
+    if (gainId == 1) { // low gain (id1), FEE gain 1
+      gainsNoise[iSample] = 1;
+      gainratio = *aGain;
       gainsPedestal[iSample] = dynamicPedestal ? 2 : -1;  //-1 for static pedestal
-    } else {
+    } else { // high gain (id0), FEE gain 10
       gainsNoise[iSample] = 0;
+      gainratio = 1;
       gainsPedestal[iSample] = dynamicPedestal ? 0 : -1;  //-1 for static pedestal
     }
 
@@ -155,6 +158,8 @@ EcalUncalibratedRecHit EcalUncalibRecHitMultiFitCubicAlgoPh2::makeRecHit(const E
   //optimized one-pulse fit for hlt
   bool usePrefit = false;
   if (_doPrefit) {
+    std::cout << "RecoLocalCalo/EcalRecAlgos/src/EcalUncalibRecHitMultiFitCubicAlgoPh2.cc line 159, SEE fullpulse: " << fullpulse << std::endl;
+
     status =
         _pulsefuncSingle.DoFit(amplitudes, noisecov, _singlebx, fullpulse, fullpulsecov, spline, gainsPedestal, badSamples);
     amplitude = status ? _pulsefuncSingle.X()[0] : 0.;
@@ -170,6 +175,10 @@ EcalUncalibratedRecHit EcalUncalibRecHitMultiFitCubicAlgoPh2::makeRecHit(const E
   if (!usePrefit) {
     if (!_computeErrors)
       _pulsefunc.disableErrorCalculation();
+
+    std::cout << "RecoLocalCalo/EcalRecAlgos/src/EcalUncalibRecHitMultiFitCubicAlgoPh2.cc line 176, SEE fullpulse: " << fullpulse << std::endl;
+
+
     status = _pulsefunc.DoFit(amplitudes, noisecov, activeBX, fullpulse, fullpulsecov, spline, gainsPedestal, badSamples);
     chisq = _pulsefunc.ChiSq();
 
