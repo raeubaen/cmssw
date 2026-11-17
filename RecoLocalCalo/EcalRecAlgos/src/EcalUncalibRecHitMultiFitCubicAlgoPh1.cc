@@ -62,17 +62,17 @@ EcalUncalibratedRecHit EcalUncalibRecHitMultiFitCubicAlgoPh1::makeRecHit(const E
     double pedestal = 0.;
     double gainratio = 1.;
 
-    if (gainId == 0 || gainId == 3) {
+    if (gainId == 0 || gainId == 3) { //gain 1 or sat
       pedestal = aped->mean_x1;
       gainratio = aGain->gain6Over1() * aGain->gain12Over6();
       gainsNoise[iSample] = 2;
       gainsPedestal[iSample] = dynamicPedestal ? 2 : -1;  //-1 for static pedestal
-    } else if (gainId == 1) {
+    } else if (gainId == 1) { //gain 12
       pedestal = aped->mean_x12;
       gainratio = 1.;
       gainsNoise[iSample] = 0;
       gainsPedestal[iSample] = dynamicPedestal ? 0 : -1;  //-1 for static pedestal
-    } else if (gainId == 2) {
+    } else if (gainId == 2) { //gain 6
       pedestal = aped->mean_x6;
       gainratio = aGain->gain12Over6();
       gainsNoise[iSample] = 1;
